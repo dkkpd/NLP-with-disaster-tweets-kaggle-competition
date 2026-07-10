@@ -83,3 +83,14 @@ DistilBERT actually understands context (like telling a literal disaster report
 apart from a tweet that just uses disaster-y words figuratively or historically), 
 while TF-IDF is just counting/weighting individual words with no sense of meaning 
 or context around them.
+
+## Kaggle Leaderboard Result
+
+Submitted predictions from the fine-tuned DistilBERT model (v4) to the official 
+Kaggle competition leaderboard.
+
+**Result: F1 Score 0.83450 — Rank #177**
+
+This closely matches the local validation F1 (0.8145) from the same model, which is 
+a good sign the validation setup was solid and not overly optimistic (no meaningful 
+gap between local validation and the real, unseen competition test set).

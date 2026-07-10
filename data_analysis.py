@@ -8,6 +8,11 @@ train.head()
 train.info()
 # %%
 train.isnull().sum()
+
+#%%
+import matplotlib.pyplot as plt
+
+
 # %%
 train['target'].value_counts(normalize=True)*100
 
