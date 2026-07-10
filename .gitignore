@@ -1,0 +1,29 @@
+# Python virtual environment
+venv/
+env/
+.venv/
+ 
+# Python cache/bytecode
+__pycache__/
+*.pyc
+*.pyo
+ 
+# Environment variables / secrets
+.env
+*.token
+ 
+# Jupyter checkpoints
+.ipynb_checkpoints/
+ 
+# Model weights / large files (kept on Hugging Face Hub instead)
+*.bin
+*.safetensors
+final_model/
+results/
+ 
+# OS-specific files
+.DS_Store
+Thumbs.db
+ 
+# VS Code settings (optional — remove this line if you want to share workspace settings)
+.vscode/
