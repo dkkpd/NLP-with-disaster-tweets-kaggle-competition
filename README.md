@@ -39,3 +39,47 @@ benchmark the fine-tuned transformer model (see below) aims to improve on.
 This baseline (80% accuracy, 0.74 F1 on the disaster class) serves as the number to 
 beat with the fine-tuned DistilBERT model in the next phase.
 
+## Fine-Tuned Model: DistilBERT
+
+To try to beat the classical baseline, I fine-tuned a pretrained DistilBERT model 
+(`distilbert-base-uncased`) on the exact same train/validation split I used for the 
+baseline, so I could compare the two fairly.
+
+**Approach:**
+- Tokenized tweets using DistilBERT's tokenizer (max length 128 tokens)
+- Added a classification head on top of the pretrained model (`num_labels=2`)
+- Fine-tuned for 3 epochs using Hugging Face's `Trainer` API on a free Google Colab 
+  T4 GPU (batch size 16, learning rate 2e-5)
+
+**Training results by epoch:**
+
+| Epoch | Training Loss | Validation Loss | Accuracy | F1 Score |
+|---|---|---|---|---|
+| 1 | 0.414 | 0.379 | 0.845 | 0.810 |
+| 2 | 0.317 | 0.398 | **0.846** | **0.810** |
+| 3 | 0.254 | 0.436 | 0.838 | 0.805 |
+
+**What I noticed — overfitting in practice:** My training loss kept dropping every 
+epoch, which looked good at first glance, but my validation loss actually got worse 
+after epoch 1, and accuracy/F1 peaked at epoch 2 before slipping slightly at epoch 3. 
+That was my first real, hands-on look at overfitting — the model kept getting better 
+at the training tweets specifically, but started losing some of its ability to 
+generalize to tweets it hadn't seen. I'd set `load_best_model_at_end=True` (tracking 
+F1) before training, specifically so the run would keep the best checkpoint 
+automatically — which turned out to matter here, since my actual final model is the 
+epoch 2 version, not epoch 3.
+
+**Final model performance (epoch 2 checkpoint):** 84.6% accuracy, 0.810 F1
+
+## Baseline vs. Fine-Tuned Comparison
+
+| Model | Accuracy | F1 Score (Disaster class) |
+|---|---|---|
+| TF-IDF + Logistic Regression | 0.800 | 0.745 |
+| Fine-tuned DistilBERT | **0.846** | **0.810** |
+
+Fine-tuning improved F1 by about 6.5 points over my baseline. My guess for why: 
+DistilBERT actually understands context (like telling a literal disaster report 
+apart from a tweet that just uses disaster-y words figuratively or historically), 
+while TF-IDF is just counting/weighting individual words with no sense of meaning 
+or context around them.
