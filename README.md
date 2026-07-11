@@ -94,3 +94,13 @@ Kaggle competition leaderboard.
 This closely matches the local validation F1 (0.8145) from the same model, which is 
 a good sign the validation setup was solid and not overly optimistic (no meaningful 
 gap between local validation and the real, unseen competition test set).
+
+## Known Limitations
+The model struggles with figurative/idiomatic use of disaster-related language. For 
+example, "This traffic is an absolute disaster" gets classified as a real disaster, 
+likely because the literal word "disaster" is a strong learned signal, and the model 
+hasn't fully learned to distinguish literal from figurative usage. This mirrors a 
+known challenge in the training data itself — some tweets use disaster vocabulary in 
+historical or figurative contexts (see EDA section) without describing a real 
+emergency, and a model this size, trained on a dataset this size, doesn't fully 
+resolve that ambiguity.
