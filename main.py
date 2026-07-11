@@ -30,7 +30,7 @@ def predict(tweet_request: TweetRequest):
     return {
         "text": tweet_request.text,
         "predicted_class": "disaster" if predicted_class == 1 else "not disaster",
-        "confidence": confidence
+        "confidence": round(confidence, 4)
     }
 
 @app.get("/")
