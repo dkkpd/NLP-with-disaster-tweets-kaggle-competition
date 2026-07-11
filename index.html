@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Disaster Tweet Classifier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1f26;
+    --panel: #212831;
+    --border: #3a4552;
+    --text: #e8e6e1;
+    --text-dim: #8b95a1;
+    --amber: #e8a33d;
+    --teal: #4a9b8e;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .console {
+    width: 100%;
+    max-width: 560px;
+    padding: 32px;
+  }
+
+  .label-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--teal);
+    box-shadow: 0 0 8px var(--teal);
+  }
+
+  .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 24px 0;
+    letter-spacing: -0.01em;
+  }
+
+  textarea {
+    width: 100%;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    padding: 14px;
+    resize: vertical;
+    min-height: 90px;
+  }
+
+  textarea:focus {
+    outline: none;
+    border-color: var(--teal);
+  }
+
+  button {
+    margin-top: 14px;
+    width: 100%;
+    background: var(--teal);
+    color: var(--bg);
+    border: none;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 13px;
+    cursor: pointer;
+  }
+
+  button:hover { opacity: 0.9; }
+  button:focus-visible { outline: 2px solid var(--text); outline-offset: 2px; }
+
+  #result-panel {
+    margin-top: 24px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px;
+    display: none;
+  }
+
+  #result-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  #confidence-text {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  .meter-track {
+    margin-top: 12px;
+    height: 6px;
+    width: 100%;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .meter-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 3px;
+    transition: width 0.4s ease;
+  }
+
+  #error-text {
+    color: var(--amber);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    margin-top: 12px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="console">
+  <div class="label-row">
+    <div class="status-dot" id="status-dot"></div>
+    <span class="eyebrow">Live Classification</span>
+  </div>
+  <h1>Disaster Tweet Classifier</h1>
+
+  <textarea id="tweet-input" placeholder="Type or paste a tweet..."></textarea>
+  <button id="classify-btn">Classify</button>
+
+  <div id="error-text"></div>
+
+  <div id="result-panel">
+    <div id="result-label"></div>
+    <div id="confidence-text"></div>
+    <div class="meter-track">
+      <div class="meter-fill" id="meter-fill"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const API_URL = "http://127.0.0.1:8000/predict";
+  const HEALTH_URL = "http://127.0.0.1:8000/";
+
+  const classifyBtn = document.getElementById("classify-btn");
+  const tweetInput = document.getElementById("tweet-input");
+  const resultPanel = document.getElementById("result-panel");
+  const resultLabel = document.getElementById("result-label");
+  const confidenceText = document.getElementById("confidence-text");
+  const meterFill = document.getElementById("meter-fill");
+  const errorText = document.getElementById("error-text");
+  const statusDot = document.getElementById("status-dot");
+
+  async function healthCheck() {
+    try {
+        const response = await fetch(HEALTH_URL);
+        if (!response.ok) {
+            throw new Error("Health check failed");
+        }
+        // API is reachable, statusDot remains teal
+    } catch (error) {
+        // API is unreachable, change statusDot to red
+        statusDot.style.backgroundColor = "red";
+        statusDot.style.boxShadow = "0 0 8px red";
+    }
+  } 
+
+  // Run the health check when the page loads
+  healthCheck();
+
+  classifyBtn.addEventListener("click", async () => {
+    
+    const tweetText = tweetInput.value.trim();
+    if (tweetText === "") {
+        errorText.textContent = "Please enter a tweet to classify.";
+        errorText.style.display = "block";
+        return;
+        }
+
+        errorText.style.display = "none"; // Clear any previous error
+
+    try {
+        const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ text: tweetText })
+        });
+
+        if (response.ok) {
+            const data = await response.json(); // take the JSON response and parse it as a JS object
+            resultLabel.textContent = data.prediction.toUpperCase(); // update the resultLabel with the prediction (DISASTER TWEET or NOT A DISASTER TWEET)
+            confidenceText.textContent = `Confidence: ${(data.confidence * 100).toFixed(2)}%`; // update the confidenceText with the confidence percentage
+            meterFill.style.backgroundColor = data.prediction === "disaster" ? "var(--amber)" : "var(--teal)";
+            resultPanel.style.display = "block";
+        } else if (response.status === 429) {
+            errorText.textContent = "Rate limit exceeded. Please wait one minute and try again";
+            errorText.style.display = "block";
+        } else {
+            errorText.textContent = "Something went wrong (status code ${response.status}). Please try again.";
+            errorText.style.display = "block";
+        }
+    } catch (error) {
+        errorText.textContent = "Could not reach the API";
+        errorText.style.display = "block";
+    }
+  });
+</script>
+
+
+</body>
+</html>
