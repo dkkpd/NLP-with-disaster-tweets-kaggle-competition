@@ -1,8 +1,9 @@
 # %% Cell 1: Load model and tokenizer from the Hub
 from transformers import AutoModelForSequenceClassification, AutoTokenizer, Trainer
 
-model_v4 = AutoModelForSequenceClassification.from_pretrained("dkkpd/disaster-tweets-distilbert")
-tokenizer = AutoTokenizer.from_pretrained("dkkpd/disaster-tweets-distilbert")
+MODEL_NAME = "dkkpd/disaster-tweets-distilbert"
+model_v4 = AutoModelForSequenceClassification.from_pretrained(MODEL_NAME)
+tokenizer = AutoTokenizer.from_pretrained(MODEL_NAME)
 
 trainer_v4 = Trainer(model=model_v4)
 
