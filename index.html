@@ -224,19 +224,20 @@
 
         if (response.ok) {
             const data = await response.json(); // take the JSON response and parse it as a JS object
-            resultLabel.textContent = data.prediction.toUpperCase(); // update the resultLabel with the prediction (DISASTER TWEET or NOT A DISASTER TWEET)
+            resultLabel.textContent = data.predicted_class.toUpperCase(); // update the resultLabel with the prediction (DISASTER TWEET or NOT A DISASTER TWEET)
             confidenceText.textContent = `Confidence: ${(data.confidence * 100).toFixed(2)}%`; // update the confidenceText with the confidence percentage
-            meterFill.style.backgroundColor = data.prediction === "disaster" ? "var(--amber)" : "var(--teal)";
+            meterFill.style.backgroundColor = data.predicted_class === "disaster" ? "var(--amber)" : "var(--teal)";
+            meterFill.style.width = `${data.confidence * 100}%`;
             resultPanel.style.display = "block";
         } else if (response.status === 429) {
             errorText.textContent = "Rate limit exceeded. Please wait one minute and try again";
             errorText.style.display = "block";
         } else {
-            errorText.textContent = "Something went wrong (status code ${response.status}). Please try again.";
+            errorText.textContent = `Something went wrong (status code ${response.status}). Please try again.`;
             errorText.style.display = "block";
         }
     } catch (error) {
-        errorText.textContent = "Could not reach the API";
+        errorText.textContent = "Error: " + error.message;
         errorText.style.display = "block";
     }
   });   
