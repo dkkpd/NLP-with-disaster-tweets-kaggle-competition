@@ -5,6 +5,7 @@ from transformers import AutoModelForSequenceClassification, AutoTokenizer
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
+from fastapi.middleware.cors import CORSMiddleware
 import torch
 
 MODEL_NAME = "dkkpd/disaster-tweets-distilbert"
@@ -18,6 +19,13 @@ limiter = Limiter(key_func=get_remote_address)
 
 app = FastAPI()
 app.state.limiter = limiter
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins for simplicity; adjust as needed
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.exception_handler(RateLimitExceeded)
 def rate_limit_handler(request: Request, exc: RateLimitExceeded):
