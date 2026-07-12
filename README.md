@@ -3,6 +3,62 @@
 Classifying tweets as real disaster reports vs. non-disaster, using the Kaggle 
 "NLP with Disaster Tweets" competition dataset.
 
+## How to Run This Project Locally
+
+This project isn't currently deployed publicly — to try it, you'll run the API and 
+frontend on your own machine. Here's how:
+
+### 1. Clone the repo
+```bash
+git clone https://github.com/dkkpd/NLP-with-disaster-tweets-kaggle-competition.git
+cd NLP-with-disaster-tweets-kaggle-competition
+```
+
+### 2. Set up a Python virtual environment
+```bash
+python -m venv venv
+```
+Activate it:
+- Windows (PowerShell): `.\venv\Scripts\Activate.ps1`
+- Mac/Linux: `source venv/bin/activate`
+
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Run the FastAPI backend
+```bash
+uvicorn main:app --reload
+```
+This starts the API at `http://127.0.0.1:8000`. On first run, it will automatically 
+download the fine-tuned model from Hugging Face Hub 
+([dkkpd/disaster-tweets-distilbert](https://huggingface.co/dkkpd/disaster-tweets-distilbert)) 
+— no separate setup needed.
+
+You can confirm it's running by visiting `http://127.0.0.1:8000/docs` in a browser, 
+which shows interactive API documentation.
+
+### 5. Open the frontend
+Open `index.html` directly in a browser (or use a tool like VS Code's Live Server 
+extension). Make sure the FastAPI server from Step 4 is still running in a separate 
+terminal — the frontend depends on it.
+
+### 6. Try it
+Type a tweet into the text box and click "Classify" to see a live prediction from 
+the fine-tuned model.
+
+**Note:** The API includes rate limiting (50 requests/minute per IP) to prevent 
+abuse — if you hit this while testing, just wait a minute and try again.
+
+---
+
+### Reproducing the model training (optional)
+The fine-tuning process itself was done in Google Colab (free GPU access). The full 
+notebook, including training output and experiment results, is available at 
+`notebooks/Kaggle_NLP_Disaster_Tweets.ipynb` and can be re-run in Colab if you want 
+to reproduce or modify the training process.
+
 ## Data Analysis
 - Dataset is reasonably balanced: ~57% non-disaster, ~43% disaster tweets
 - No missing values in the `text` or `target` columns (the two used for modeling)

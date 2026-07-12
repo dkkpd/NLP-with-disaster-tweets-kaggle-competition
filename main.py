@@ -38,7 +38,7 @@ class TweetRequest(BaseModel):
     text: str  
 
 @app.post("/predict")
-@limiter.limit("10/minute")  # Limit to 10 requests per minute per IP
+@limiter.limit("50/minute")  # Limit to 50 requests per minute per IP
 def predict(request: Request, tweet_request: TweetRequest):
     # Tokenize the input text
     inputs = tokenizer(tweet_request.text, return_tensors="pt", truncation=True, padding=True, max_length=MAX_LENGTH)
