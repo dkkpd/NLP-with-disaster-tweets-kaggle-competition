@@ -5,9 +5,6 @@ Classifying tweets as real disaster reports vs. non-disaster, using the Kaggle
 
 ## How to Run This Project Locally
 
-This project isn't currently deployed publicly — to try it, you'll run the API and 
-frontend on your own machine. Here's how:
-
 ### 1. Clone the repo
 ```bash
 git clone https://github.com/dkkpd/NLP-with-disaster-tweets-kaggle-competition.git
