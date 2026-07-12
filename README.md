@@ -159,4 +159,4 @@ hasn't fully learned to distinguish literal from figurative usage. This mirrors 
 known challenge in the training data itself — some tweets use disaster vocabulary in 
 historical or figurative contexts (see EDA section) without describing a real 
 emergency, and a model this size, trained on a dataset this size, doesn't fully 
-resolve that ambiguity.
+resolve that ambiguity quite yet.
