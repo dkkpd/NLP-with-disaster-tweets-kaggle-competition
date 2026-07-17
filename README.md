@@ -50,6 +50,35 @@ abuse — if you hit this while testing, just wait a minute and try again.
 
 ---
 
+### Option 2: Run with Docker (no Python setup required)
+
+If you have [Docker](https://www.docker.com/products/docker-desktop) installed, you 
+can skip all the manual Python/venv/dependency setup above entirely.
+
+**1. Build the image**
+```bash
+docker build -t disaster-tweets-api .
+```
+This installs all dependencies and packages the API into a self-contained image — 
+takes a few minutes the first time (mostly downloading PyTorch/transformers), faster 
+on subsequent builds.
+
+**2. Run the container**
+```bash
+docker run -p 8000:8000 disaster-tweets-api
+```
+This starts the API at `http://127.0.0.1:8000`, exactly like the manual setup above.
+
+**3. Open the frontend**
+Same as Option 1 — open `index.html` in a browser, with the container still running 
+in a separate terminal.
+
+**Why Docker:** this guarantees the exact same environment (Python version, package 
+versions, OS-level dependencies) regardless of what's installed on your machine — 
+avoids potential setup issues like dependency conflicts or platform-specific errors.
+
+---
+
 ### Reproducing the model training (optional)
 The fine-tuning process itself was done in Google Colab (free GPU access). The full 
 notebook, including training output and experiment results, is available at 
