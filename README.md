@@ -1,3 +1,5 @@
+![Disaster Tweets API Demo](assets/demo.gif)
+
 # Disaster Tweets Classification
 
 Classifying tweets as real disaster reports vs. non-disaster, using the Kaggle 
